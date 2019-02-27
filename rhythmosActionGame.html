@@ -9,13 +9,27 @@
 <title>RhythmosActionGame</title>
 <script type="text/javascript" src="rhythmosActionGame/js/jquery-3.3.1.min.js"></script>
 
+<!-- Live2D Library -->
+<script src="rhythmosActionGame/js/live2d/live2d.min.js"></script>
+<script src='rhythmosActionGame/js/live2d/framework/Live2DFramework.js'></script> 
+<script src="rhythmosActionGame/js/live2d/utils/MatrixStack.js"></script> 
+<script src="rhythmosActionGame/js/live2d/utils/ModelSettingJson.js"></script> 
+<script src="rhythmosActionGame/js/live2d/PlatformManager.js"></script> 
+<script src="rhythmosActionGame/js/live2d/LAppDefine.js"></script> 
+<script src="rhythmosActionGame/js/live2d/LAppModel.js"></script> 
+<script src="rhythmosActionGame/js/live2d/LAppLive2DManager.js"></script> 
+<!-- Live2D User's Script -->
+<script src="rhythmosActionGame/js/live2d/SampleApp1.js"></script>
+
 </head>
-<body>
-	<canvas id="rhythmosActionGameCanvas"></canvas>
-	
-	<audio autoplay="autoplay" loop="loop">
-		<source src="rhythmosActionGame/audio/songs/Airhead.mp3" type="audio/wave">
+<body style="width:500px;height:500px;">
+	<canvas id="rhythmosActionGameCanvas" style="position:absolute;z-index:10;"></canvas>
+	<canvas id="glCanvas" style="position:absolute;z-index:0;"></canvas>
+	<img id="loadingImage"/>
+	<audio id='gameAudio' preload='auto' loop='loop'>
+		<source src='rhythmosActionGame/audio/songs/hiBiKaSe.mp3' type='audio/wave'>
 	</audio>
+	
 	<script type="text/javascript" src="rhythmosActionGame/js/rhythmosActionGameJs.js"></script>
 </body>
 </html>

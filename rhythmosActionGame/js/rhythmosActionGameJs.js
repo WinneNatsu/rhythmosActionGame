@@ -1,43 +1,57 @@
+/**
+ * TodoList
+ * 1.preload interface
+ * 		-- 一个等待加载画面
+ * 		-- 优化加载/资源未加载出来时理应不停判断，直至加载完成后刷新出页面。
+ * 		-- 配合加载图片节奏的BGM
+ * 
+ * 2.开始游戏界面
+ * 		-- 鼠标点击两次才会切画面，第一次让标题聚合，第二次必须点击【标题】，否则标题还会散开。
+ * 				标题聚合出现小球体，可触发第二次点击，进入下一场景时移动至中心并放大。点击会对选取界面发生影响。
+ * 		-- 标题音乐
+ * 3.过场动画
+ * 
+ * 4.中心球体
+ * 
+ * 5.与Mysql数据库关联（为了演示时证明自己可以操作数据库（后台）
+ * 
+ * 6.Live2d
+ * 
+ * 7.兼容问题
+ * 		-- HTML5 Audio在Safari（Ipad Pro）不播放
+ * 
+ * 8.实时匹配窗口大小
+ * 		-- when window size changed set the new screenWidth and screenHeight value
+ * 
+ * */
+/**
+ * TODO
+ * 1.开始界面，鼠标点击声(可以是一段曲子，每点一次播放一个音符，按顺序播放) 与 开始游戏（进入选曲界面）声
+ * 2.开始界面音乐 _ 钢琴曲
+ * 3.选曲界面音乐（当鼠标移入曲框时，淡入切换至对应歌曲；移出时淡出回到选区界面音乐）
+ * 4.选择一个歌曲后，将所选得Songbox粒子化并炸开，半径逐渐增大，最后盖住屏幕。随后切换至下一个场景时，粒子再逐渐变小组成下一个场景（其实就是新场景得粒子随机分布后进行聚合，与上个场景得粒子无关）。
+ * 5.开始界面的移动音符蓝色或淡蓝色如何？现在的黑色与背景图不太搭。
+ * */
+
 var rhythmosCanvas = document.getElementById("rhythmosActionGameCanvas");
 var ctx = rhythmosCanvas.getContext('2d');
+//live2d Canvas
+var live2dCharacterCanvas = document.getElementById("glCanvas");
+var live2dCharacterName = "glCanvas";
 // autoScreenWidth&Height
 var screenWidth = window.innerWidth;
 var screenHeight = window.innerHeight;
+//var screenWidthScale = screenWidth/1920;
+//var screenHeightScale = screenHeight/1080;
+var decrescViewScale = 1920/944;
 //--------------------------------------------------
 // variables
 //--------------------------------------------------
 
-// backgroundImg
-var gameBackgroundImg = new Image();
-gameBackgroundImg.src = "rhythmosActionGame/img/gameBackgroundImg1.jpg";
-var gameBackgroundImg2 = new Image();
-gameBackgroundImg2.src = "rhythmosActionGame/img/gameBackgroundImg2.jpg";
-
-// gameTitleImg
-var gameTitleImg = new Image();
-gameTitleImg.src = "rhythmosActionGame/img/gameTitle.png";
-
-/** gameBackgroundNotes imgLoad*/
-var gameBackgroundNote1 = new Image();
-var gameBackgroundNote2 = new Image();
-var gameBackgroundNote3 = new Image();
-gameBackgroundNote1.src = "rhythmosActionGame/img/backgroundNotes/test1.png";
-gameBackgroundNote2.src = "rhythmosActionGame/img/backgroundNotes/test2.png";
-gameBackgroundNote3.src = "rhythmosActionGame/img/backgroundNotes/test3.png";
-/** 图片数组*/
-var gameImages = [];
-gameImages.push(gameBackgroundNote1);
-gameImages.push(gameBackgroundNote2);
-gameImages.push(gameBackgroundNote3);
-gameImages.push(gameBackgroundImg);
-gameImages.push(gameTitleImg);
-
-var gameBackgroundNoteReady = 0;
-
 // backgroundFocal
 var focalLength = 1000,
 // backNoteQuality
-	backNoteN = 80,
+	backNoteN = 70,
 // backNoteArray
 	backNotes = [],
 // the Center of the Canvas with X Position
@@ -62,6 +76,8 @@ var state_gameTitlePE_initFlag = false;
 
 // universalInterval for state
 var state_setUniversalInterval = null;
+// preload flag
+var preloadCompleteFlag = false;
 
 //
 var titleParticles = []; 
@@ -77,20 +93,78 @@ var gameTitleInterfaceAnimate_breakFlag = false;
 
 
 var gameTitleAnimateOverCount = 0;
-/**
- * TODO
- * 1.开始界面，鼠标点击声(可以是一段曲子，每点一次播放一个音符，按顺序播放) 与 开始游戏（进入选曲界面）声
- * 2.开始界面音乐 _ 钢琴曲
- * 3.选曲界面音乐（当鼠标移入曲框时，淡入切换至对应歌曲；移出时淡出回到选区界面音乐）
- * 4.选择一个歌曲后，将所选得Songbox粒子化并炸开，半径逐渐增大，最后盖住屏幕。随后切换至下一个场景时，粒子再逐渐变小组成下一个场景（其实就是新场景得粒子随机分布后进行聚合，与上个场景得粒子无关）。
- * 5.开始界面的移动音符蓝色或淡蓝色如何？现在的黑色与背景图不太搭。
- * */
 
+var rhythmosCanvasClickMouseX = 0;
+var rhythmosCanvasClickMouseY = 0;
+//=========================================================
+// Resources
+//=========================================================
+/**
+ * images
+ * */
+// gameBackgroundNotes
+var gameBackgroundNote1 = new Image();
+var gameBackgroundNote2 = new Image();
+var gameBackgroundNote3 = new Image();
+gameBackgroundNote1.src = "rhythmosActionGame/img/backgroundNotes/test1.png";
+gameBackgroundNote2.src = "rhythmosActionGame/img/backgroundNotes/test2.png";
+gameBackgroundNote3.src = "rhythmosActionGame/img/backgroundNotes/test3.png";
+//backgroundImg
+var gameBackgroundImg = new Image();
+gameBackgroundImg.src = "rhythmosActionGame/img/gameBackgroundImg1.jpg";
+var gameBackgroundImg2 = new Image();
+gameBackgroundImg2.src = "rhythmosActionGame/img/gameBackgroundImg2.jpg";
+//gameTitleImg
+var gameTitleImg = new Image();
+gameTitleImg.src = "rhythmosActionGame/img/gameTitle.png";
+//loadingImg
+var preloadGifImg = new Image();
+preloadGifImg.src = "rhythmosActionGame/img/loading_1.gif";
+// songBoxImages
+var songBoxImage_1 = new Image();
+var songBoxImage_2 = new Image();
+var songBoxImage_3 = new Image();
+var songBoxImage_4 = new Image();
+var songBoxImage_5 = new Image();
+var songBoxImage_6 = new Image();
+var songBoxImage_7 = new Image();
+songBoxImage_1.src = "rhythmosActionGame/img/songs/1.jpg";
+songBoxImage_2.src = "rhythmosActionGame/img/songs/2.jpg";
+songBoxImage_3.src = "rhythmosActionGame/img/songs/3.jpg";
+songBoxImage_4.src = "rhythmosActionGame/img/songs/4.jpg";
+songBoxImage_5.src = "rhythmosActionGame/img/songs/5.png";
+songBoxImage_6.src = "rhythmosActionGame/img/songs/6.jpg";
+songBoxImage_7.src = "rhythmosActionGame/img/songs/7.png";
+/** 图片数组*/
+var gameImages = [];
+gameImages.push(gameBackgroundNote1);
+gameImages.push(gameBackgroundNote2);
+gameImages.push(gameBackgroundNote3);
+gameImages.push(songBoxImage_1);
+gameImages.push(songBoxImage_2);
+gameImages.push(songBoxImage_3);
+gameImages.push(songBoxImage_4);
+gameImages.push(songBoxImage_5);
+gameImages.push(songBoxImage_6);
+gameImages.push(songBoxImage_7);
+gameImages.push(gameBackgroundImg);
+gameImages.push(gameBackgroundImg2);
+gameImages.push(gameTitleImg);
+gameImages.push(preloadGifImg);
+
+var gameInitResourcesReadyCount = 0;
+/**
+ * audio
+ * */
+/** audio*/
+var gameAudio = document.getElementById("gameAudio");
+gameAudio.volume = 0.3;
+var gameAudioSrc;
 //---------------------------------------------------------
 // stateMachine
 //---------------------------------------------------------
 /**
- * 1.stateInit_loadImage 预加载图片
+ * 1.state_preloadInterface 预加载资源
  * 2.state_gameTitleInterface 游戏开始界面
  * 3.state_selectSongInterface 选曲界面
  * */
@@ -104,14 +178,17 @@ var stateMachine = {
 	transition: function(){
 		switch (stateMachine.currentState) {
 		case 1:
-			stateMachine.currentState = state_loadImage();
+			state_preloadInterface();
 			break;
 		case 2:
-			// TODO 状态转换再了Animate函数中，在其中更改了状态码并调用了一次状态机（不主动调用，程序会直接终止）, 需要优化，尽量使状态的转换在状态机内执行，外部尽量不调用状态机。
+			// TODO 状态转换在Animate函数中，在其中更改了状态码并调用了一次状态机（不主动调用，程序会直接终止）, 需要优化，尽量使状态的转换在状态机内执行，外部尽量不调用状态机。
 			state_gameTitleInterface();
 			break;
 		case 3:
 			state_selectSongInterface();
+			break;
+		case 4:
+			state_playGameInterface();
 			break;
 		default:
 			break;
@@ -125,39 +202,60 @@ var stateMachine = {
 };
 
 /**
- * 1.preload Images
+ * 1.preload Interface
  * */
-function state_loadImage(){
-
-	gameImages.forEach(function(){
-		if(this.complete){
-			gameBackgroundNoteReady++;
-		}
-	});
-	if(gameBackgroundNoteReady == gameImages.length){
-		// success & initGame & changeStateFlag to next State
+function state_preloadInterface(){
+	//TODO 逻辑有问题，如果没加载完gif和音频即创建元素，是否会BUG。因为下方function只会进一次。有没有可能出现没有loading图出现得情况
+	if(!state_setUniversalInterval){
+		// set canvas width&height
+		initGameCanvas();
+		// loading gif
+		$("#loadingImage").attr("width",screenHeight/4*0.9)
+			.attr("height",screenHeight/4)
+			.attr("src","rhythmosActionGame/img/loading_2.gif")
+			.attr("border","3")
+			.css({"position":"absolute","z-index":"100","margin-top":screenHeight/2-screenHeight/8,"margin-left":screenWidth/2-screenHeight/8*0.9})
+			.bind("contextmenu", function(e){ return false;})
+	
+		//$("#glCanvas").after("<img id='loadingImage' width='"+screenHeight/4*0.9+"' height='"+screenHeight/4+"' src='../img/games/rhythmosActionGameImgs/loading_2.gif' border='3' style='margin-top: "+(screenHeight/2-screenHeight/8)+"px;margin-left: "+(screenWidth/2-screenHeight/8*0.9)+"px;position:absolute;z-index:100;' />"); 
+		state_setUniversalInterval = true;
+	}
+	
+	// preload images
+	if(gameInitResourcesReadyCount!=gameImages.length){
+		// preload false & reset count
+		gameInitResourcesReadyCount = 0;
 		
-		// clearInterval which used for Images Load Complete 
-		clearInterval(state_setUniversalInterval);
-		state_universalOnceFlag = false;
-		/**
-		 * initRhythmosGame()
-		 * 
-		 * First  : set canvasWidth & Height
-		 * Second : create backNotes & push to array
-		 * */ 
-		initRhythmosGame();
-		return 2;
+		gameImages.forEach(function(){
+			if(this.complete){
+				gameInitResourcesReadyCount++;
+			}
+		});
 	}else{
-		// false & reset count
-		gameBackgroundNoteReady = 0;
-		
-		if(!state_universalOnceFlag){
-			// loop the state_loadImage(),until all Images loaded
-			state_universalOnceFlag = true;
-			state_setUniversalInterval = setInterval("stateMachine.transition()",500);
-			return 1;
-		}
+		// success & initGame & changeStateFlag to next State
+		preloadCompleteFlag = true;
+	}
+	
+	// clear canvas
+	ctx.clearRect(0,0,2*screenWidth,2*screenHeight);
+	
+	// progress bar
+	preloadProgressBar(gameInitResourcesReadyCount,gameImages.length);
+
+	// loop this function
+	if(true) {
+	   if("requestAnimationFrame" in window){
+	       requestAnimationFrame(state_preloadInterface);
+	   }
+	   else if("webkitRequestAnimationFrame" in window){
+	       webkitRequestAnimationFrame(state_preloadInterface);
+	   }
+	   else if("msRequestAnimationFrame" in window){
+	       msRequestAnimationFrame(state_preloadInterface);
+	   }
+	   else if("mozRequestAnimationFrame" in window){
+	       mozRequestAnimationFrame(state_preloadInterface);
+	   }
 	}
 }
 
@@ -172,10 +270,17 @@ function state_gameTitleInterface(){
  * 3.the interface of select song 
  * */
 function state_selectSongInterface(){
+	live2dSwitch(true);
 	songBoxesAnimate();
 }
+/**
+ * 4.play game
+ * */
+function state_playGameInterface(){
+	$("#loadingImage").attr("","");
+}
 //----------------------------------------------
-// SongBox 正在开发区
+// SongBox
 //----------------------------------------------
 var songBoxes = [];
 // Count the song box which in the upRight Area
@@ -193,9 +298,10 @@ function songBoxPrototype(songNo,songName,songBoxImageUrl,audioUrl,notesJsonUrl,
 	this.composer = composer;
 	this.creatTime = creatTime;
 
-	// 16:10
+	// 14:10
 	this.width = screenWidth/6.4;
 	this.height = screenHeight/5;
+
 	
 	this.x = screenWidth + this.width;
 	this.y = screenHeight/8;
@@ -223,6 +329,7 @@ function songBoxPrototype(songNo,songName,songBoxImageUrl,audioUrl,notesJsonUrl,
 		 * */
 	    //var songBoxpattern = ctx.createPattern(this.songBoxImage, "no-repeat");
 	    ctx.save();
+		// 鼠标是否点击此图标
 		drawRoundRect(ctx,this.x,this.y,this.width,this.height,25);
 		// 剪切区域，之后操作都会被限制此前"设置"的区域内
 		ctx.clip();
@@ -230,6 +337,13 @@ function songBoxPrototype(songNo,songName,songBoxImageUrl,audioUrl,notesJsonUrl,
 		ctx.lineWidth=3;
 	    ctx.fillStyle = "black";
 	    ctx.stroke();
+		if(ctx.isPointInPath(rhythmosCanvasClickMouseX,rhythmosCanvasClickMouseY)){
+			rhythmosCanvasClickMouseX = -100;
+			rhythmosCanvasClickMouseY = -100;
+			// TODO 未完成
+			console.log(this.songNo);
+			gameAudioSrc = this.audioUrl;
+		}
 	    ctx.restore();
 		/**
 		 * calculate songBox position
@@ -249,13 +363,6 @@ function songBoxPrototype(songNo,songName,songBoxImageUrl,audioUrl,notesJsonUrl,
 			(this.x < this.ex) ? (this.x += (this.ex - this.x) * 0.1) : this.x = this.ex;
 	    }    
 	}
-	// TODO 这里出问题 移到外面声明成变量
-	/*
-	// Count the song box which in the upRight Area
-	songBoxPrototype.prototype.songBoxesUpCount = 0;
-	// Count the song box which in the downLeft Area
-	songBoxPrototype.prototype.songBoxesDownCount = 0;
-	*/
 }
 
 function createSongBoxes(){
@@ -318,7 +425,7 @@ function createSongBoxes(){
 
 function songBoxesAnimate(){
 	
-	// TODO 优化 放到合适的地方 还有这个tempFlag处理一下
+	// TODO 优化 放到合适的地方 / 这Flag在更改状态时reset了嘛？
 	if(!state_universalOnceFlag){
 		createSongBoxes();
 		state_universalOnceFlag = true;
@@ -353,24 +460,84 @@ function songBoxesAnimate(){
 	}
 }
 
+function preloadStartGameResource(){
+	$("#gameAudio").attr("src",gameAudioSrc);
+	gameAudio.play();
+	gameAudioSrc = null;
+}
 //----------------------------------------------
 // the notes move in the background
 //----------------------------------------------
 /**
- * initGame
+ * init canvas
  * */
-function initRhythmosGame(){
+function initGameCanvas(){
+
+	/**
+	 * init main canvas
+	 * */
+	// 禁止移动端点击元素出现黑色背景闪烁
+	$("#rhythmosActionGameCanvas").css("-webkit-tap-highlight-color","transparent");
+	// 1920 : 944
+	if(screenWidth/screenHeight > decrescViewScale){
+		
+		screenWidth = screenHeight*decrescViewScale;
+	}else if(screenWidth/screenHeight < decrescViewScale){
+		screenHeight = screenWidth/decrescViewScale;
+	}
 	//setCanvasWidth&Height
 	rhythmosCanvas.width = screenWidth;
 	rhythmosCanvas.height = screenHeight;
 	vpx = screenWidth/2;
 	vpy = screenHeight/2;
-
-	// create backNotes
+}
+/**
+ * initGame
+ * 		1.init Canvas width & height
+ * 		2.init Live2D
+ * 		3.init backNotes
+ * */
+function initRhythmosGame(){
+	/**
+	 * init live2D
+	 * */
+	initLive2dCharacter();
+	
+	/**
+	 * init backNotes
+	 * */ 
 	for (var i=0; i<backNoteN; i++) {
 		var note = new gameBackgroundNotes(Math.floor(Math.random()*10%3),Math.floor(Math.random()*screenWidth),Math.floor(Math.random()*screenHeight),Math.floor(Math.random()*focalLength));				
 		backNotes.push(note);
 	}
+}
+
+/**
+ * init Live2d Charcter
+ * 		1.init live2d canvas width & height
+ * 		2.calculate live2dCanvas position
+ * 		3.start live2d
+ * */
+function initLive2dCharacter(){
+	// setLive2dCanvas Width&Height
+	live2dCharacterCanvas.width = screenWidth/(1920/400);
+	live2dCharacterCanvas.height = live2dCharacterCanvas.width;
+	
+	//calculate live2dCanvas position
+	var live2dCharacterOffsetLeft = screenWidth - live2dCharacterCanvas.width*1.5;
+	var live2dCharacterOffsetTop = screenHeight - live2dCharacterCanvas.height;
+	$('#'+live2dCharacterName).offset({top:live2dCharacterOffsetTop,left:live2dCharacterOffsetLeft});
+	// start
+	SampleApp1();
+}
+/**
+ * switch of the live2d
+ * 		true  : ON
+ * 		false : OFF
+ * */
+function live2dSwitch(live2dOnOff){
+	// the main canvas z-index is 10,So if want to turn on the live2d,set z-index > 10
+	live2dOnOff ? $("#glCanvas").css("z-index",11) : $("#glCanvas").css("z-index",0);
 }
 
 /**
@@ -397,8 +564,8 @@ function gameBackgroundNotes(noteImgNo,noteX,noteY,noteZ){
 	this.noteZ = noteZ;
 	this.scale = focalLength / (focalLength + this.noteZ);
 	this.noteImgUrl = new Image();
-	this.noteWidth = 80;
-	this.noteHeight = 80;
+	this.noteWidth = 70*this.scale;
+	this.noteHeight = 70*this.scale;
 	this.drawX = this.noteX * this.scale;
 	this.drawY = this.noteY * this.scale;
 	this.drawWidth = this.noteWidth*this.scale;
@@ -605,6 +772,15 @@ function interfaceCutscenesAnimate(){
 //--------------------------------------------
 
 /**
+ * loading gif Switch
+ * 		-- true Show
+ * 		-- false hide
+ * */
+function loadingGifSwitch(loadingOnOff){
+	loadingOnOff ? $("#loadingImage").show(1000) : $("#loadingImage").hide(1000);
+}
+
+/**
  *  gameTitlePE
  *  
  *  To : Particle Effects
@@ -642,26 +818,27 @@ function titleParticle(x,y,radius,rgba){
 
 // 
 function drawTextOfGameTitle(){
-	//var titleFontSize = 150;
-	//titleFontSize = titleFontSize * 
+
 	var fontSizeScale = (screenWidth + screenHeight)/(1920+1080);
     ctx.save()
+	// clear canvas; make sure only title in the canvas
+	ctx.clearRect(0,0,2*screenWidth,2*screenHeight);
     ctx.drawImage(gameTitleImg,screenWidth*(3/4),screenHeight*(3/4),400*fontSizeScale,100*fontSizeScale);
     ctx.restore();
     // 获取文字粒子
-    titleParticles = gameTitlePE();
+    titleParticles = gameTitlePE(screenWidth*(3/4),screenHeight*(3/4),400*fontSizeScale,100*fontSizeScale);
 }
 
 // 获取像素点并压入数组
-function gameTitlePE() {
-	var imageData = this.ctx.getImageData(0, 0, screenWidth, screenHeight);
+function gameTitlePE(startX,startY,getDataWidth,getDataHeight) {
+	var imageData = this.ctx.getImageData(startX, startY, getDataWidth, getDataHeight);
 
 	for (var x = 0; x < imageData.width; x+=2) {
 	   for (var y = 0; y < imageData.height; y+=2) {
 
 	       var i = 4*(y * imageData.width + x);
 	       if (imageData.data[i] > 0) {
-			titleParticles.push(new titleParticle(x-1,y-1,1,{
+			titleParticles.push(new titleParticle(x-1 + startX, y-1 + startY, 1,{
 				r : imageData.data[i],
 				g : imageData.data[i+1],
 				b : imageData.data[i+2],
@@ -708,21 +885,66 @@ Array.prototype.forEach = function(callback){
 // eventListener
 //-----------------------------------------
 rhythmosCanvas.addEventListener("mousemove",function(evt){
-  mouseMoveX = evt.x - rhythmosCanvas.getBoundingClientRect().left;
-  mouseMoveY = evt.y - rhythmosCanvas.getBoundingClientRect().top;
-  if(mouseMoveX > screenWidth*(3/4) && mouseMoveY > screenHeight*(3/4)){
-	  mouseMoveArea_gameTitle = true;
-  }else{
-	  mouseMoveArea_gameTitle = false;
-  }
+	// catch mouse position when move
+	mouseMoveX = evt.x - rhythmosCanvas.getBoundingClientRect().left;
+	mouseMoveY = evt.y - rhythmosCanvas.getBoundingClientRect().top;
+  
+	if(mouseMoveX > screenWidth*(3/4) && mouseMoveY > screenHeight*(3/4)){
+		mouseMoveArea_gameTitle = true;
+	}else{
+		mouseMoveArea_gameTitle = false;
+	}
 })
 
 rhythmosCanvas.addEventListener("click",function(evt){
-	// gameTitleAnimatePause ? gameTitleAnimatePause = false : gameTitleAnimatePause = true;
-	gameTitleInterfaceAnimate_breakFlag = true;
-	stateMachine.currentState = 3;
+	// catch mouse position when click
+	rhythmosCanvasClickMouseX = evt.x - rhythmosCanvas.getBoundingClientRect().left;
+	rhythmosCanvasClickMouseY = evt.y - rhythmosCanvas.getBoundingClientRect().top;
+	
+	switch (stateMachine.currentState) {
+	case 1:
+		if(preloadCompleteFlag){
+			stateMachine.currentState = 2;
+			initRhythmosGame();
+			gameAudio.play();
+			loadingGifSwitch(false);
+			// 调用状态机，进入下一状态
+			stateMachine.transition();
+		}
+		break;
+	case 2:
+		// TODO 此处未理清思路和优化
+		gameTitleInterfaceAnimate_breakFlag = true;
+		stateMachine.currentState = 3;
+		break;
+	case 3:
+		preloadStartGameResource();
+		break;
+	default:
+		break;
+	}
 })
 
+// 移动端禁止拉动页面
+document.body.addEventListener('touchmove', function (e) {
+	e.preventDefault(); //阻止默认的处理方式(阻止下拉滑动的效果)
+}, {passive: false});
+
+/////////////////////////////////////////////////////
+gameAudio.addEventListener("canplay", function(){
+	// 监听audio是否加载完毕，如果加载完毕，则读取audio播放时间
+   // document.getElementById('audio_length_total').innerHTML=transTime(audio.duration);
+});
+
+
+
+// can play through audio without stopping
+gameAudio.addEventListener("canplaythrough", function()
+  {
+  //TODO audio 指的是 《myVid=document.getElementById("video1");》中得myVid这个值； 所以需要替换上方audio.addEventListener()中得audio
+  }
+);
+//////////////////////////////////////////////////////////////
 //-----------------------------------------------
 // Interval
 //-----------------------------------------------
@@ -747,6 +969,30 @@ function drawRoundRect(subAreaLEventCxt, x, y, width, height, radius){
 	subAreaLEventCxt.arc(radius + x, height - radius + y, radius, Math.PI * 1 / 2, Math.PI); 
 	subAreaLEventCxt.closePath(); 
 }
+
+/**
+ * preload ProgressBar
+ * 		readyCount : the number of preload compelete resource
+ * 		allResourcesCount : the number of all resources
+ * */
+function preloadProgressBar(readyCount,allResourcesCount){
+	ctx.save();
+	ctx.beginPath(); 
+	// progress of the all
+	ctx.arc(screenWidth/2,screenHeight/2, 200, 0, Math.PI * 2, false);
+	ctx.lineWidth = 20; 
+	ctx.strokeStyle = "#F0F0F0";
+	ctx.stroke();
+	ctx.beginPath();
+	// progress of the played
+	ctx.arc(screenWidth/2,screenHeight/2, 200, Math.PI * 3 / 2, (Math.PI * 3 / 2 + Math.PI * 2 / 180 + readyCount/allResourcesCount * Math.PI * 2), false); 
+	ctx.lineWidth = 15; 
+	ctx.strokeStyle = "#EEBD44"; 
+	ctx.stroke();
+	ctx.closePath();
+	ctx.restore();
+}
+
 //-------------------------------
 stateMachine.transition();
 

@@ -27,10 +27,10 @@ var LAppDefine = {
     PRIORITY_FORCE : 3,
     
     
-    BACK_IMAGE_NAME : "live2d/backImg/back_class_normal.png",
+    BACK_IMAGE_NAME : "rhythmosActionGame/live2d/backImg/back_class_normal.png",
 
     
-    MODEL_HARU : "live2d/haru/haru.model.json",
+    MODEL_HARU : "rhythmosActionGame/live2d/haru/haru.model.json",
     
     
     MOTION_GROUP_IDLE : "idle", 

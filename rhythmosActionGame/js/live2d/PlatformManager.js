@@ -78,7 +78,7 @@ PlatformManager.prototype.loadTexture     = function(model/*ALive2DModel*/, no/*
     loadedImage.onload = function() {
                 
         // create texture
-        var canvas = document.getElementById("glcanvas");
+        var canvas = document.getElementById("glCanvas");
         var gl = getWebGLContext(canvas, {premultipliedAlpha : true});
         var texture = gl.createTexture();	 
         if (!texture){ console.error("Failed to generate gl texture name."); return -1; }

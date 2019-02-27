@@ -1,63 +1,63 @@
 [
 	{
 		"songNo" : "1",
-		"songName" : "1Airhead",
-		"songBoxImageUrl" : "rhythmosActionGame/img/gameBackgroundImg2.jpg",
-		"audioUrl" : "rhythmosActionGame/audio/songs/hiBiKaSe.mp3",
+		"songName" : "Airhead",
+		"songBoxImageUrl" : "rhythmosActionGame/img/songs/1.jpg",
+		"audioUrl" : "rhythmosActionGame/audio/songs/Megalovania.mp3",
 		"notesJsonUrl" : "123snakeGmaes321Canvas",
 		"composer":"123",
 		"creatTime" : "2019/02/02"
 	},
 	{
 		"songNo" : "2",
-		"songName" : "2blackbox",
-		"songBoxImageUrl" : "rhythmosActionGame/img/gameBackgroundImg1.jpg",
-		"audioUrl" : "rhythmosActionGame/audio/songs/blackbox.wav",
+		"songName" : "blackbox",
+		"songBoxImageUrl" : "rhythmosActionGame/img/songs/2.jpg",
+		"audioUrl" : "rhythmosActionGame/audio/songs/Airhead.mp3",
 		"notesJsonUrl" : "123snakeGmaes321Canvas",
 		"composer":"aaa",
 		"creatTime" : "2019/02/02"
 	},
 	{
 		"songNo" : "3",
-		"songName" : "3Airhead",
-		"songBoxImageUrl" : "rhythmosActionGame/img/gameBackgroundImg2.jpg",
-		"audioUrl" : "rhythmosActionGame/audio/songs/hiBiKaSe.mp3",
+		"songName" : "3",
+		"songBoxImageUrl" : "rhythmosActionGame/img/songs/3.jpg",
+		"audioUrl" : "rhythmosActionGame/audio/songs/Megalovania.mp3",
 		"notesJsonUrl" : "123snakeGmaes321Canvas",
 		"composer":"123",
 		"creatTime" : "2019/02/02"
 	},
 	{
 		"songNo" : "4",
-		"songName" : "4blackbox",
-		"songBoxImageUrl" : "rhythmosActionGame/img/gameBackgroundImg1.jpg",
-		"audioUrl" : "rhythmosActionGame/audio/songs/blackbox.wav",
+		"songName" : "4",
+		"songBoxImageUrl" : "rhythmosActionGame/img/songs/4.jpg",
+		"audioUrl" : "rhythmosActionGame/audio/songs/Airhead.mp3",
 		"notesJsonUrl" : "123snakeGmaes321Canvas",
 		"composer":"aaa",
 		"creatTime" : "2019/02/02"
 	},
 	{
 		"songNo" : "5",
-		"songName" : "5Airhead",
-		"songBoxImageUrl" : "rhythmosActionGame/img/gameBackgroundImg2.jpg",
-		"audioUrl" : "rhythmosActionGame/audio/songs/hiBiKaSe.mp3",
+		"songName" : "5",
+		"songBoxImageUrl" : "rhythmosActionGame/img/songs/5.png",
+		"audioUrl" : "rhythmosActionGame/audio/songs/Megalovania.mp3",
 		"notesJsonUrl" : "123snakeGmaes321Canvas",
 		"composer":"123",
 		"creatTime" : "2019/02/02"
 	},
 	{
 		"songNo" : "6",
-		"songName" : "6blackbox",
-		"songBoxImageUrl" : "rhythmosActionGame/img/gameBackgroundImg1.jpg",
-		"audioUrl" : "rhythmosActionGame/audio/songs/blackbox.wav",
+		"songName" : "6",
+		"songBoxImageUrl" : "rhythmosActionGame/img/songs/6.jpg",
+		"audioUrl" : "rhythmosActionGame/audio/songs/Airhead.mp3",
 		"notesJsonUrl" : "123snakeGmaes321Canvas",
 		"composer":"aaa",
 		"creatTime" : "2019/02/02"
 	},
-		{
+	{
 		"songNo" : "7",
-		"songName" : "7Airhead",
-		"songBoxImageUrl" : "rhythmosActionGame/img/gameBackgroundImg2.jpg",
-		"audioUrl" : "rhythmosActionGame/audio/songs/hiBiKaSe.mp3",
+		"songName" : "7",
+		"songBoxImageUrl" : "rhythmosActionGame/img/songs/7.png",
+		"audioUrl" : "rhythmosActionGame/audio/songs/Megalovania.mp3",
 		"notesJsonUrl" : "123snakeGmaes321Canvas",
 		"composer":"123",
 		"creatTime" : "2019/02/02"
