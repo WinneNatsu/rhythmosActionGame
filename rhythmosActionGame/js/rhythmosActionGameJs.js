@@ -167,6 +167,9 @@ var gameAudioSrc;
  * 1.state_preloadInterface 预加载资源
  * 2.state_gameTitleInterface 游戏开始界面
  * 3.state_selectSongInterface 选曲界面
+ * 4.state_loadSelectSongGameStartResourcesInterface 游戏资源加载界面 // 未实装
+ * 5.state_playGameInterface 游戏界面  // 未实装
+ * 6.state_gameClear 游戏结算界面 // 未实装
  * */
 var stateMachine = {
 		
@@ -188,6 +191,9 @@ var stateMachine = {
 			state_selectSongInterface();
 			break;
 		case 4:
+			state_loadSelectSongGameStartResourcesInterface();
+			break;
+		case 5:
 			state_playGameInterface();
 			break;
 		default:
@@ -273,8 +279,15 @@ function state_selectSongInterface(){
 	live2dSwitch(true);
 	songBoxesAnimate();
 }
+
 /**
- * 4.play game
+ * 4.the interface of load resources to play game
+ * */
+function state_loadSelectSongGameStartResourcesInterface(){
+
+}
+/**
+ * 5.play game
  * */
 function state_playGameInterface(){
 	$("#loadingImage").attr("","");
